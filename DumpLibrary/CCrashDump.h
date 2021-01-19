@@ -3,7 +3,8 @@
 
 class CCrashDump
 {
-public:
+private:
+
 	CCrashDump(void)
 	{
 		//mDumpCount = 0;
@@ -28,6 +29,20 @@ public:
 
 		SetHandlerDump();
 	}
+
+	~CCrashDump()
+	{
+	}
+
+public:
+
+	static CCrashDump* GetInstance()
+	{
+		static CCrashDump crashDump;
+
+		return &crashDump;
+	}
+
 
 	static void Crash(void)
 	{
@@ -131,6 +146,4 @@ public:
 	}
 
 	static long mDumpCount;
-
 };
-
