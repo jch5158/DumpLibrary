@@ -1,8 +1,8 @@
-﻿#include "stdafx.h"
+﻿#include "CCrashDump.h"
 
 int wmain()
 {
-	CCrashDump crash;
+	CCrashDump::GetInstance();
 
 }
 
