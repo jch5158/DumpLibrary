@@ -1,14 +1,14 @@
 #pragma once
 
-// Dump 클래스에 필요한 Lib
-#pragma comment(lib, "DbgHelp.Lib")
-
 #include <iostream>
 #include <Windows.h>
 
 // Dump 클래스에 필요한 헤더
 #include <psapi.h>
 #include <dbghelp.h>
+
+// Dump 클래스에 필요한 Lib
+#pragma comment(lib, "DbgHelp.Lib")
 
 
 class CCrashDump
@@ -56,17 +56,17 @@ public:
 
 	static void Crash(void)
 	{
-		int* ptr = nullptr;
+		LONG* ptr = nullptr;
 		*ptr = 0;
 	}
 
 	static LONG WINAPI MyExceptionFilter(PEXCEPTION_POINTERS pExceptionPointer)
 	{
-		int workingMemory = 0;
+		LONG workingMemory = 0;
 
 		SYSTEMTIME stNowTime;
 
-		long DumptCount = InterlockedIncrement(&mDumpCount);
+		LONG DumptCount = InterlockedIncrement(&mDumpCount);
 
 		
 		// 현재 프로세스의 메모리 사용량을 얻어온다.
@@ -82,7 +82,7 @@ public:
 		// 메모리 덤프 크기 구하기
 		if (GetProcessMemoryInfo(hProcess, &pmc, sizeof(pmc)))
 		{
-			workingMemory = (int)(pmc.WorkingSetSize / 1024 / 1024);
+			workingMemory = (LONG)(pmc.WorkingSetSize / 1024 / 1024);
 		}
 
 		CloseHandle(hProcess);
@@ -112,8 +112,8 @@ public:
 			MinidumpExceptionInformation.ExceptionPointers = pExceptionPointer;
 
 			// 외부에서 해당 프로세스의 덤프를 남길 때 사용하는 플래그인 것 같다.
-			// 근데 true,false를 넣던 작동의 변화가 없다. 
-			MinidumpExceptionInformation.ClientPointers = true;
+			// 근데 TRUE,FALSE를 넣던 작동의 변화가 없다. 
+			MinidumpExceptionInformation.ClientPointers = TRUE;
 
 			MiniDumpWriteDump(
 				GetCurrentProcess(),
@@ -138,16 +138,17 @@ public:
 		SetUnhandledExceptionFilter(MyExceptionFilter);
 	}
 
+
 	// Invalid Paramter handler
-	static void myInvalidParamterHandler(const WCHAR* expression, const WCHAR* function, const WCHAR* file, unsigned int line, uintptr_t pReserved)
+	static void myInvalidParamterHandler(const WCHAR* expression, const WCHAR* function, const WCHAR* file, UINT line, uintptr_t pReserved)
 	{
 		Crash();
 	}
 
-	static int _custom_Report_hook(int ireposttype, char* message, int* returnvalue)
+	static LONG _custom_Report_hook(INT ireposttype, char* message, INT* returnvalue)
 	{
 		Crash();
-		return true;
+		return TRUE;
 	}
 
 	static void mPurecallHandler(void)
@@ -155,5 +156,5 @@ public:
 		Crash();
 	}
 
-	inline static long mDumpCount = 0;
+	inline static LONG mDumpCount = 0;
 };
